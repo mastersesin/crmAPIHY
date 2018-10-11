@@ -5,3 +5,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:st!xadminHY@11.11.
 db = SQLAlchemy(app)
 from my_app.dbStructure.dbStructure import User
 db.create_all()
+from my_app.hello import views

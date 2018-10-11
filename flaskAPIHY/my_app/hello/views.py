@@ -1,7 +1,8 @@
-from my_app import app
+from my_app import app,db
 from flask import render_template, jsonify, request
 import pyodbc
 import hashlib
+from my_app.dbStructure.dbStructure import User
 from flask_httpauth import HTTPBasicAuth
 
 auth = HTTPBasicAuth()
@@ -10,7 +11,8 @@ returnCode = {
     'wrongToken':{"code":-222,"msg":'Wrong Token'},
     'InternalError':{"code:":-224,"msg":'Internal Error'},
     'loginSuccess':{"code":-225,"msg":'Login success'},
-    'wrongIdOrPasswd':{"code":-226,"msg":'wrongIdOrPasswd'}
+    'wrongIdOrPasswd':{"code":-226,"msg":'wrongIdOrPasswd'},
+    'UserCreated':{"code":-227,"msg":"Success! You can now generate token"}
 }
 def querySqlGetLoginInfo(cardId):
     server = '11.11.11.16,9433'
@@ -39,6 +41,16 @@ def verify_password(token,password):
 @app.route('/api/v1')
 def hello_world():
     return "<h1>HYG CRM APIs</h1>"
+
+@app.route('/api/v1/register',methods = ['POST'])
+def register():
+    name = request.form.get('name')
+    password = request.form.get('password')
+    user = User(name,password)
+    db.session.add(user)
+    db.session.commit()
+    return jsonify(returnCode['UserCreated'])
+
 
 @app.route('/api/v1/cardinfo/<cardId>/<inputPasswd>')
 @auth.login_required
